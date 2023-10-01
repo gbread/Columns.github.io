@@ -5,19 +5,19 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Piece : MonoBehaviour
+public class PlayerPiece : BasePiece
 {
     [SerializeField]
     Tile[] allTiles;
 
-    BoardMonoBehaviour board;
+
     const int TILES_COUNT = 3;
-    Tile[] tiles;
     int rotation=0;
-    Vector3Int position;
-    float stepDelay = 0.5f;
+
     float downPressedStepDelay = 0.05f;
-    float stepTime = 0;
+
+    protected override float StepDelay => Input.GetKey(KeyCode.DownArrow) ? downPressedStepDelay : base.StepDelay;
+
     IEnumerable<Vector3Int> CellPositions {
         get
         {
@@ -31,15 +31,8 @@ public class Piece : MonoBehaviour
     {
         return tiles[(index + rotation) % tiles.Length];
     }
-    public IEnumerable<TilePosition> TilePositions
-    {
-        get
-        {
-            return TilePositionsRelativeTo(this.position);
-        }
-    }
 
-    private IEnumerable<TilePosition> TilePositionsRelativeTo(Vector3Int position)
+    protected override IEnumerable<TilePosition> TilePositionsRelativeTo(Vector3Int position)
     {
         for (int i = 0; i < tiles.Length; i++)
         {
@@ -60,7 +53,7 @@ public class Piece : MonoBehaviour
 
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         board.Clear(this);
 
@@ -92,31 +85,6 @@ public class Piece : MonoBehaviour
         board.ActivePieceCantMoveDown();
     }
 
-    void Step()
-    {
-        stepTime += Time.deltaTime;        
-        if (stepTime < stepDelay && !Input.GetKey(KeyCode.DownArrow))
-            return;
-        if (Input.GetKey(KeyCode.DownArrow) && stepTime < downPressedStepDelay)
-            return;
-
-        stepTime = 0;
-        bool didMoveDown = TryMoveIfValid(Vector2Int.down);
-        if (!didMoveDown)
-        {
-            board.ActivePieceCantMoveDown();
-        }
-    }
-
-    public bool TryMoveIfValid(Vector2Int translation)
-    {
-        Vector3Int newPostion = position + (Vector3Int)translation;
-        if (TilePositionsRelativeTo(newPostion).Any(x => !board.IsValidPosition(x.position))) 
-            return false;
-        
-        position = newPostion;
-        return true;
-    }
 
     void Rotate(int count)
     {

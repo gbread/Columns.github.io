@@ -11,7 +11,7 @@ public class BoardMonoBehaviour : MonoBehaviour
 {
     [SerializeField]
     Tilemap tilemap;
-    private Piece activePiece;
+    private PlayerPiece activePiece;
     [SerializeField]
     private Vector2Int spawnPosition;
     [SerializeField]
@@ -28,7 +28,7 @@ public class BoardMonoBehaviour : MonoBehaviour
     private void Awake()
     {
         tilemap = GetComponentInChildren<Tilemap>();
-        activePiece = GetComponent<Piece>();
+        activePiece = GetComponent<PlayerPiece>();
     }
 
     // Start is called before the first frame update
@@ -49,14 +49,14 @@ public class BoardMonoBehaviour : MonoBehaviour
         Set(activePiece);
     }
 
-    public void Set(Piece piece)
+    public void Set(BasePiece piece)
     {
         foreach (var tilePosition in piece.TilePositions)
         {
             tilemap.SetTile(tilePosition.position, tilePosition.tile);
         } 
     }
-    public void Clear(Piece piece)
+    public void Clear(BasePiece piece)
     {
         foreach (var tilePosition in piece.TilePositions)
         {
@@ -183,5 +183,11 @@ public class BoardMonoBehaviour : MonoBehaviour
             }
         }
         return result;
-    } 
+    }
+    
+    //private IEnumerable<BasePiece> GetPiecesAboveExplodedPieces(IEnumerable<Vector3Int> explosionPositions)
+    //{
+    //    //explosionPositions
+    //    //    .Select(x => )
+    //}
 }
