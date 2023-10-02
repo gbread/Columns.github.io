@@ -100,7 +100,7 @@ jobs:
             Library-${{ matrix.projectPath }}-
             Library-
 
-      - uses: webbertakken/unity-builder@v2
+      - uses: webbertakken/unity-builder@v3
         with:
           projectPath: ${{ matrix.projectPath }}
           unityVersion: ${{ matrix.unityVersion }}
