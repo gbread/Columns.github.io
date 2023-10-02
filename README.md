@@ -1,1 +1,3 @@
-# Columns.github.io
+# Columns
+
+Basic game made in Unity
