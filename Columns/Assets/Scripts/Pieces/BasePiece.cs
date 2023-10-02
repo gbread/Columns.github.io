@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using Assets.Scripts.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,20 @@ public class BasePiece : MonoBehaviour
     [SerializeField]
     protected float stepDelay = 0.5f;
     protected float stepTime = 0;
+    protected IPieceCantFallDelegate pieceCantFallDelegate;
 
-    public static BasePiece CreatePiece(Board board, Vector2Int position, IEnumerable<TilePosition> tiles, GameObject prefab)
+
+    protected void Initialize(Board board, Vector2Int position, IPieceCantFallDelegate pieceCantFallDelegate)
+    {
+        this.board = board;
+        this.position = (Vector3Int)position;
+        this.pieceCantFallDelegate = pieceCantFallDelegate;
+    }
+    public static BasePiece CreatePiece(Board board, Vector2Int position, IEnumerable<TilePosition> tiles, GameObject prefab, IPieceCantFallDelegate pieceCantFallDelegate)
     {
         var newGameObject = Instantiate(prefab, board.transform);
         var result = newGameObject.GetComponent<BasePiece>();
-        result.board = board;
-        result.position = (Vector3Int)position;
+        result.Initialize(board, position, pieceCantFallDelegate);
         result.tiles = tiles.Select(x => x.tile).ToArray();
         return result;
     }
@@ -63,7 +71,6 @@ public class BasePiece : MonoBehaviour
         board.Clear(this);
 
         Step();
-
         board.Set(this);
     }
 
@@ -77,7 +84,7 @@ public class BasePiece : MonoBehaviour
         bool didMoveDown = TryMoveIfValid(Vector2Int.down);
         if (!didMoveDown)
         {
-            board.ActivePieceCantMoveDown(this);
+            pieceCantFallDelegate.PieceCantFallCallback(this);
         }
     }
 

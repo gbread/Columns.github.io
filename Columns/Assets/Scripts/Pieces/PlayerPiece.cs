@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using Assets.Scripts.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +39,9 @@ public class PlayerPiece : BasePiece
         }
     }
 
-    public void InitializeRandomTiles(Board board, Vector2Int position)
+    public void InitializeRandomTiles(Board board, Vector2Int position, IPieceCantFallDelegate pieceCantFallDelegate)
     {
-        this.board = board;
-        this.position = (Vector3Int)position;
+        Initialize(board, position, pieceCantFallDelegate);
         tiles = new Tile[TILES_COUNT];
         for (int i = 0; i < tiles.Length; i++)
         {
@@ -71,14 +71,13 @@ public class PlayerPiece : BasePiece
         }
 
         Step();
-
         board.Set(this);
     }
 
     void Drop()
     {
         while (TryMoveIfValid(Vector2Int.down)) { }
-        board.ActivePieceCantMoveDown(this);
+        pieceCantFallDelegate.PieceCantFallCallback(this);
     }
 
     void Rotate(int count)

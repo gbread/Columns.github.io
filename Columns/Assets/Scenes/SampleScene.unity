@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 439265453}
   - component: {fileID: 439265452}
   - component: {fileID: 439265454}
+  - component: {fileID: 439265455}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -185,6 +186,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPosition: {x: 0, y: 7}
   boardSize: {x: 10, y: 20}
+--- !u!114 &439265455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439265451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a12f10d25fa89634494b61dd74fb259c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   playerPiecePrefab: {fileID: 5782527940193534281, guid: 944878b3b3bd9cc479fbd0b349f9f82f, type: 3}
   basePiecePrefab: {fileID: 1981789431077940234, guid: 347842728b96db442b35520eaae8c051, type: 3}
 --- !u!1 &470774087

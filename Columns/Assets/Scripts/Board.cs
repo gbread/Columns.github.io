@@ -11,16 +11,9 @@ public class Board : MonoBehaviour
 {
     Tilemap tilemap;
     [SerializeField]
-    private Vector2Int spawnPosition;
+    public Vector2Int spawnPosition;
     [SerializeField]
     private Vector2Int boardSize = new Vector2Int(10, 20);
-    [SerializeField]
-    private GameObject playerPiecePrefab;
-    [SerializeField]
-    private GameObject basePiecePrefab;
-
-    private readonly HashSet<TilePosition> freshPositions = new();
-    private readonly List<BasePiece> activePieces = new();
 
     private RectInt Bounds
     {
@@ -36,33 +29,6 @@ public class Board : MonoBehaviour
         tilemap = GetComponentInChildren<Tilemap>();
     }
 
-    void Start()
-    {
-        SpawnPiece();
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            GameOver();
-        }
-    }
-
-    public void SpawnPiece()
-    {
-        var activePiece = Instantiate(playerPiecePrefab, transform).GetComponent<PlayerPiece>();
-        activePiece.InitializeRandomTiles(this, spawnPosition);
-        activePieces.Add(activePiece);
-
-        if (!activePiece.TryMoveIfValid(Vector2Int.zero))
-        {
-            GameOver();
-        }
-
-        Set(activePiece);
-    }
-
     public void Set(BasePiece piece)
     {
         if (!piece.enabled) return;
@@ -75,9 +41,17 @@ public class Board : MonoBehaviour
 
     public void Clear(BasePiece piece)
     {
-        foreach (var tilePosition in piece.TilePositions)
+        Clear(piece.TilePositions.Select(tilePosition => tilePosition.position));
+    }
+    public void Clear()
+    {
+        tilemap.ClearAllTiles();
+    }
+    public void Clear(IEnumerable<Vector3Int> positions)
+    {
+        foreach (var position in positions)
         {
-            tilemap.SetTile(tilePosition.position, null);
+            tilemap.SetTile(position, null);
         }
     }
 
@@ -93,52 +67,6 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    private void DeletePiece(BasePiece piece)
-    {
-        piece.enabled = false;
-        activePieces.Remove(piece);
-        Destroy(piece.gameObject);
-    }
-
-    public void GameOver()
-    {
-        tilemap.ClearAllTiles();
-        while (activePieces.Count() > 0)
-        {
-            DeletePiece(activePieces.Last());
-        }
-
-        SpawnPiece();
-    }
-
-    public void ActivePieceCantMoveDown(BasePiece piece)
-    {
-        Set(piece);
-        freshPositions.UnionWith(piece.TilePositions);
-        DeletePiece(piece);
-        if (activePieces.Count() == 0)
-        {
-            Explode();
-        }
-        if (activePieces.Count() == 0)
-        {
-            SpawnPiece();
-        }
-    }
-
-    private void Explode()
-    {
-        var explodingTiles = GetExplodingTiles();
-        foreach (var explodingTile in explodingTiles)
-        {
-            tilemap.SetTile(explodingTile, null);
-        }
-        freshPositions.Clear();
-
-        var newPieces = GetPiecesAboveExplodedPieces(explodingTiles);
-        activePieces.AddRange(newPieces);
-    }
-
     IEnumerable<Vector3Int> SliceTilesOnlyPositions(Vector3Int direction, Vector3Int position)
     {
         while (!IsEmptyOrOutside(position - direction))
@@ -151,7 +79,7 @@ public class Board : MonoBehaviour
             position += direction;
         }
     }
-    IEnumerable<TilePosition> SliceTiles(Vector3Int direction, Vector3Int position)
+    public IEnumerable<TilePosition> SliceTiles(Vector3Int direction, Vector3Int position)
     {
         return SliceTilesOnlyPositions(direction, position).Select(x => new TilePosition(tilemap.GetTile<Tile>(x), x));
     }
@@ -188,7 +116,7 @@ public class Board : MonoBehaviour
         return result;
     }
 
-    private IEnumerable<Vector3Int> GetExplodingTiles()
+    public IEnumerable<Vector3Int> GetExplodingTiles(IEnumerable<TilePosition> freshPositions)
     {
         var directions = new Vector2Int[] { Vector2Int.down, Vector2Int.right, Vector2Int.right + Vector2Int.down, Vector2Int.right - Vector2Int.down };
         var result = new HashSet<Vector3Int>();
@@ -210,11 +138,5 @@ public class Board : MonoBehaviour
         return result;
     }
 
-    private IEnumerable<BasePiece> GetPiecesAboveExplodedPieces(IEnumerable<Vector3Int> explosionPositions)
-    {
-        return explosionPositions
-            .Select(explodedPosition => new { position = explodedPosition + Vector3Int.up, tiles = SliceTiles(Vector3Int.down, explodedPosition) })
-            .Where(x => x.tiles.Count() > 0)
-            .Select(x => BasePiece.CreatePiece(this, (Vector2Int)x.position, x.tiles.Reverse(), basePiecePrefab));
-    }
+
 }
