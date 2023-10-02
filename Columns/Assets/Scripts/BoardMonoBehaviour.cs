@@ -162,18 +162,18 @@ public class BoardMonoBehaviour : MonoBehaviour
 
     private IEnumerable<TilePosition> GetExplodingTilesFromRow(IEnumerable<TilePosition> tiles)
     {
-        var tilesArray = tiles.ToArray();
+
         Func<TilePosition, TilePosition, bool> tilesAreEqual = (a, b) => a.tile.name == b.tile.name;
         var currentTiles = new HashSet<TilePosition>();
         var result = new List<TilePosition>();
         const int countInARowToExplode = 3;
-        currentTiles.Add(tilesArray[0]);
-        var lastTile = tilesArray[0];
-        for (int i = 1; i < tilesArray.Length; i++)
+        currentTiles.Add(tiles.First());
+        var lastTile = tiles.First();
+        foreach (var tile in tiles.Skip(1))
         {
-            if (tilesAreEqual(lastTile, tilesArray[i]))
+            if (tilesAreEqual(lastTile, tile))
             {
-                currentTiles.Add(tilesArray[i]);
+                currentTiles.Add(tile);
             } 
             else
             {
@@ -182,9 +182,9 @@ public class BoardMonoBehaviour : MonoBehaviour
                     result.AddRange(currentTiles);
                 }
                 currentTiles.Clear();
-                currentTiles.Add(tilesArray[i]);
+                currentTiles.Add(tile);
             }
-            lastTile = tilesArray[i];
+            lastTile = tile;
         }
         if (currentTiles.Count >= countInARowToExplode)
         {
