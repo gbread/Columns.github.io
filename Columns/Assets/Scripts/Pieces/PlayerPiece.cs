@@ -38,7 +38,7 @@ public class PlayerPiece : BasePiece
         }
     }
 
-    public void InitializeRandomTiles(BoardMonoBehaviour board, Vector2Int position)
+    public void InitializeRandomTiles(Board board, Vector2Int position)
     {
         this.board = board;
         this.position = (Vector3Int)position;

@@ -7,14 +7,14 @@ using UnityEngine.Tilemaps;
 
 public class BasePiece : MonoBehaviour
 {
-    protected BoardMonoBehaviour board;
+    protected Board board;
     protected Tile[] tiles;
     protected Vector3Int position;
     [SerializeField]
     protected float stepDelay = 0.5f;
     protected float stepTime = 0;
 
-    public static BasePiece CreatePiece(BoardMonoBehaviour board, Vector2Int position, IEnumerable<TilePosition> tiles, GameObject prefab)
+    public static BasePiece CreatePiece(Board board, Vector2Int position, IEnumerable<TilePosition> tiles, GameObject prefab)
     {
         var newGameObject = Instantiate(prefab, board.transform);
         var result = newGameObject.GetComponent<BasePiece>();

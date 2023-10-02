@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [System.Serializable]
-public class BoardMonoBehaviour : MonoBehaviour
+public class Board : MonoBehaviour
 {
     Tilemap tilemap;
     [SerializeField]
