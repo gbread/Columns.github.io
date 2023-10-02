@@ -4,6 +4,9 @@ on: push
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+with:
+    projectPath: ${{ matrix.projectPath }}
+    unityVersion: ${{ matrix.unityVersion }}
 
 jobs:
   checkLicense:
