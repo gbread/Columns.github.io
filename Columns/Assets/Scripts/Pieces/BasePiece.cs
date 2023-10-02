@@ -1,6 +1,5 @@
 using Assets.Scripts;
 using Assets.Scripts.Interfaces;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -37,16 +36,6 @@ public class BasePiece : MonoBehaviour
         get
         {
             return stepDelay;
-        }
-    }
-    IEnumerable<Vector3Int> CellPositions
-    {
-        get
-        {
-            for (int i = 0; i < tiles.Length; i++)
-            {
-                yield return position + i * Vector3Int.up;
-            }
         }
     }
 
