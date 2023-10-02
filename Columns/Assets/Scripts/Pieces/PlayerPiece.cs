@@ -12,6 +12,7 @@ public class PlayerPiece : BasePiece
     Tile[] allTiles;
     const int TILES_COUNT = 3;
     int rotation = 0;
+    [SerializeField]
     readonly float downPressedStepDelay = 0.05f;
     protected override float StepDelay => Input.GetKey(KeyCode.DownArrow) ? downPressedStepDelay : base.StepDelay;
 
@@ -49,10 +50,8 @@ public class PlayerPiece : BasePiece
         }
     }
 
-    public override void Update()
+    override protected void CustomUpdate()
     {
-        board.Clear(this);
-
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             TryMoveIfValid(Vector2Int.left);
@@ -69,9 +68,6 @@ public class PlayerPiece : BasePiece
         {
             Drop();
         }
-
-        Step();
-        board.Set(this);
     }
 
     void Drop()

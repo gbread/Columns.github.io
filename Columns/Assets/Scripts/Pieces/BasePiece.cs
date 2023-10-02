@@ -66,15 +66,19 @@ public class BasePiece : MonoBehaviour
         }
     }
 
-    public virtual void Update()
+    void Update()
     {
         board.Clear(this);
+
+        CustomUpdate();
 
         Step();
         board.Set(this);
     }
 
-    protected void Step()
+    protected virtual void CustomUpdate() { }
+
+    private void Step()
     {
         stepTime += Time.deltaTime;
         if (stepTime < StepDelay)
