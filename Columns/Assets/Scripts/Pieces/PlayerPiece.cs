@@ -9,16 +9,13 @@ public class PlayerPiece : BasePiece
 {
     [SerializeField]
     Tile[] allTiles;
-
-
     const int TILES_COUNT = 3;
-    int rotation=0;
-
-    float downPressedStepDelay = 0.05f;
-
+    int rotation = 0;
+    readonly float downPressedStepDelay = 0.05f;
     protected override float StepDelay => Input.GetKey(KeyCode.DownArrow) ? downPressedStepDelay : base.StepDelay;
 
-    IEnumerable<Vector3Int> CellPositions {
+    IEnumerable<Vector3Int> CellPositions
+    {
         get
         {
             for (int i = 0; i < tiles.Length; i++)
@@ -27,6 +24,7 @@ public class PlayerPiece : BasePiece
             }
         }
     }
+
     Tile RotatedTile(int index)
     {
         return tiles[(index + rotation) % tiles.Length];
@@ -51,8 +49,6 @@ public class PlayerPiece : BasePiece
         }
     }
 
-
-    // Update is called once per frame
     public override void Update()
     {
         board.Clear(this);
@@ -84,7 +80,6 @@ public class PlayerPiece : BasePiece
         while (TryMoveIfValid(Vector2Int.down)) { }
         board.ActivePieceCantMoveDown(this);
     }
-
 
     void Rotate(int count)
     {

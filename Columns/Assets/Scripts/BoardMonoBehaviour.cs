@@ -18,9 +18,9 @@ public class BoardMonoBehaviour : MonoBehaviour
     private GameObject playerPiecePrefab;
     [SerializeField]
     private GameObject basePiecePrefab;
-    private HashSet<TilePosition> freshPositions = new HashSet<TilePosition>();
 
-    private List<BasePiece> activePieces = new List<BasePiece>();
+    private readonly HashSet<TilePosition> freshPositions = new();
+    private readonly List<BasePiece> activePieces = new();
 
     private RectInt Bounds
     {
@@ -34,13 +34,12 @@ public class BoardMonoBehaviour : MonoBehaviour
     private void Awake()
     {
         tilemap = GetComponentInChildren<Tilemap>();
-        
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        SpawnPiece();   
+        SpawnPiece();
     }
 
     void Update()
@@ -49,7 +48,6 @@ public class BoardMonoBehaviour : MonoBehaviour
         {
             GameOver();
         }
-
     }
 
     public void SpawnPiece()
@@ -63,8 +61,6 @@ public class BoardMonoBehaviour : MonoBehaviour
             GameOver();
         }
 
-        
-
         Set(activePiece);
     }
 
@@ -75,7 +71,7 @@ public class BoardMonoBehaviour : MonoBehaviour
         foreach (var tilePosition in piece.TilePositions)
         {
             tilemap.SetTile(tilePosition.position, tilePosition.tile);
-        } 
+        }
     }
 
     public void Clear(BasePiece piece)
@@ -86,11 +82,7 @@ public class BoardMonoBehaviour : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Returns true for empty tile inside the board
-    /// </summary>
-    /// <param name="position"></param>
-    public bool IsValidPosition(Vector3Int position)
+    public bool IsEmptyAndInsideTheBoard(Vector3Int position)
     {
         if (!Bounds.Contains((Vector2Int)position)) return false;
         return IsEmptyOrOutside(position);
@@ -108,7 +100,6 @@ public class BoardMonoBehaviour : MonoBehaviour
         activePieces.Remove(piece);
         Destroy(piece.gameObject);
     }
-
 
     public void GameOver()
     {
@@ -168,7 +159,6 @@ public class BoardMonoBehaviour : MonoBehaviour
 
     private IEnumerable<TilePosition> GetExplodingTilesFromRow(IEnumerable<TilePosition> tiles)
     {
-
         Func<TilePosition, TilePosition, bool> tilesAreEqual = (a, b) => a.tile.name == b.tile.name;
         var currentTiles = new HashSet<TilePosition>();
         var result = new List<TilePosition>();
@@ -180,7 +170,7 @@ public class BoardMonoBehaviour : MonoBehaviour
             if (tilesAreEqual(lastTile, tile))
             {
                 currentTiles.Add(tile);
-            } 
+            }
             else
             {
                 if (currentTiles.Count >= countInARowToExplode)
@@ -224,7 +214,7 @@ public class BoardMonoBehaviour : MonoBehaviour
     private IEnumerable<BasePiece> GetPiecesAboveExplodedPieces(IEnumerable<Vector3Int> explosionPositions)
     {
         return explosionPositions
-            .Select(explodedPosition => new { position = explodedPosition + Vector3Int.up, tiles = SliceTiles(Vector3Int.down, explodedPosition)})
+            .Select(explodedPosition => new { position = explodedPosition + Vector3Int.up, tiles = SliceTiles(Vector3Int.down, explodedPosition) })
             .Where(x => x.tiles.Count() > 0)
             .Select(x => BasePiece.CreatePiece(this, (Vector2Int)x.position, x.tiles.Reverse(), basePiecePrefab));
     }

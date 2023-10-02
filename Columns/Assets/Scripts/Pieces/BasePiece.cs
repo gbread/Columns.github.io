@@ -58,7 +58,6 @@ public class BasePiece : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     public virtual void Update()
     {
         board.Clear(this);
@@ -72,7 +71,7 @@ public class BasePiece : MonoBehaviour
     {
         stepTime += Time.deltaTime;
         if (stepTime < StepDelay)
-            return;        
+            return;
 
         stepTime = 0;
         bool didMoveDown = TryMoveIfValid(Vector2Int.down);
@@ -85,7 +84,7 @@ public class BasePiece : MonoBehaviour
     public bool TryMoveIfValid(Vector2Int translation)
     {
         Vector3Int newPostion = position + (Vector3Int)translation;
-        if (TilePositionsRelativeTo(newPostion).Any(x => !board.IsValidPosition(x.position)))
+        if (TilePositionsRelativeTo(newPostion).Any(x => !board.IsEmptyAndInsideTheBoard(x.position)))
             return false;
 
         position = newPostion;
