@@ -10,7 +10,6 @@ using UnityEngine.Tilemaps;
 public class BoardMonoBehaviour : MonoBehaviour
 {
     Tilemap tilemap;
-    private PlayerPiece activePiece;
     [SerializeField]
     private Vector2Int spawnPosition;
     [SerializeField]
@@ -19,6 +18,7 @@ public class BoardMonoBehaviour : MonoBehaviour
     private GameObject playerPiecePrefab;
     [SerializeField]
     private GameObject basePiecePrefab;
+    private HashSet<TilePosition> freshPositions = new HashSet<TilePosition>();
 
     private List<BasePiece> activePieces = new List<BasePiece>();
 
@@ -54,7 +54,7 @@ public class BoardMonoBehaviour : MonoBehaviour
 
     public void SpawnPiece()
     {
-        activePiece = Instantiate(playerPiecePrefab, transform).GetComponent<PlayerPiece>();
+        var activePiece = Instantiate(playerPiecePrefab, transform).GetComponent<PlayerPiece>();
         activePiece.InitializeRandomTiles(this, spawnPosition);
         activePieces.Add(activePiece);
 
@@ -124,9 +124,8 @@ public class BoardMonoBehaviour : MonoBehaviour
     public void ActivePieceCantMoveDown(BasePiece piece)
     {
         Set(piece);
-        
+        freshPositions.UnionWith(piece.TilePositions);
         DeletePiece(piece);
-
         if (activePieces.Count() == 0)
         {
             Explode();
@@ -141,7 +140,7 @@ public class BoardMonoBehaviour : MonoBehaviour
         {
             tilemap.SetTile(explodingTile, null);
         }
-
+        freshPositions.Clear();
     }
 
     IEnumerable<Vector3Int> SliceTilesOnlyPositions(Vector3Int direction, Vector3Int position)
@@ -199,7 +198,7 @@ public class BoardMonoBehaviour : MonoBehaviour
         var directions = new Vector2Int[] { Vector2Int.down, Vector2Int.right, Vector2Int.right + Vector2Int.down, Vector2Int.right - Vector2Int.down };
         var result = new HashSet<Vector3Int>();
 
-        foreach (var tilePosition in activePiece.TilePositions)
+        foreach (var tilePosition in freshPositions)
         {
             var tile = tilePosition.tile;
             foreach (var direction in directions)
