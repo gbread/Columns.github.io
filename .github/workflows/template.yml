@@ -66,6 +66,8 @@ jobs:
       matrix:
         projectPath:
           - ./Columns/
+        unityVersion:
+          - 2022.3.10f1
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -97,7 +99,8 @@ jobs:
 
       - uses: webbertakken/unity-builder@v2
         with:
-          projectPath: ./Columns/
+          projectPath: ${{ matrix.projectPath }}
+          unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: WebGL
 
       - uses: actions/upload-artifact@v2
