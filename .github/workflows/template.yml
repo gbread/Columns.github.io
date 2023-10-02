@@ -92,7 +92,7 @@ jobs:
           path: ${{ matrix.projectPath }}/Library
           key: Library-build-WebGL
           restore-keys: |
-            Library-build-
+            Library-${{ matrix.projectPath }}-
             Library-
 
       - uses: webbertakken/unity-builder@v2
