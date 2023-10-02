@@ -36,7 +36,6 @@ public class BoardMonoBehaviour : MonoBehaviour
         tilemap = GetComponentInChildren<Tilemap>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         SpawnPiece();
