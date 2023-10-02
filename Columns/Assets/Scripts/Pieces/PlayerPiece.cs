@@ -82,7 +82,7 @@ public class PlayerPiece : BasePiece
     void Drop()
     {
         while (TryMoveIfValid(Vector2Int.down)) { }
-        board.ActivePieceCantMoveDown();
+        board.ActivePieceCantMoveDown(this);
     }
 
 

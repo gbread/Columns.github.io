@@ -9,13 +9,19 @@ using UnityEngine.Tilemaps;
 [System.Serializable]
 public class BoardMonoBehaviour : MonoBehaviour
 {
-    [SerializeField]
     Tilemap tilemap;
     private PlayerPiece activePiece;
     [SerializeField]
     private Vector2Int spawnPosition;
     [SerializeField]
     private Vector2Int boardSize = new Vector2Int(10, 20);
+    [SerializeField]
+    private GameObject playerPiecePrefab;
+    [SerializeField]
+    private GameObject basePiecePrefab;
+
+    private List<BasePiece> activePieces = new List<BasePiece>();
+
     private RectInt Bounds
     {
         get
@@ -28,7 +34,7 @@ public class BoardMonoBehaviour : MonoBehaviour
     private void Awake()
     {
         tilemap = GetComponentInChildren<Tilemap>();
-        activePiece = GetComponent<PlayerPiece>();
+        
     }
 
     // Start is called before the first frame update
@@ -37,25 +43,41 @@ public class BoardMonoBehaviour : MonoBehaviour
         SpawnPiece();   
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameOver();
+        }
+
+    }
+
     public void SpawnPiece()
     {
+        activePiece = Instantiate(playerPiecePrefab, transform).GetComponent<PlayerPiece>();
         activePiece.InitializeRandomTiles(this, spawnPosition);
+        activePieces.Add(activePiece);
 
         if (!activePiece.TryMoveIfValid(Vector2Int.zero))
         {
             GameOver();
         }
 
+        
+
         Set(activePiece);
     }
 
     public void Set(BasePiece piece)
     {
+        if (!piece.enabled) return;
+
         foreach (var tilePosition in piece.TilePositions)
         {
             tilemap.SetTile(tilePosition.position, tilePosition.tile);
         } 
     }
+
     public void Clear(BasePiece piece)
     {
         foreach (var tilePosition in piece.TilePositions)
@@ -80,37 +102,46 @@ public class BoardMonoBehaviour : MonoBehaviour
         return true;
     }
 
-
-    void Update()
+    private void DeletePiece(BasePiece piece)
     {
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            tilemap.ClearAllTiles();
-            SpawnPiece();
-        }
+        piece.enabled = false;
+        activePieces.Remove(piece);
+        Destroy(piece.gameObject);
     }
+
 
     public void GameOver()
     {
         tilemap.ClearAllTiles();
+        while (activePieces.Count() > 0)
+        {
+            DeletePiece(activePieces.Last());
+        }
+
         SpawnPiece();
     }
 
-    public void ActivePieceCantMoveDown()
+    public void ActivePieceCantMoveDown(BasePiece piece)
     {
-        Set(activePiece);
+        Set(piece);
+        
+        DeletePiece(piece);
 
-        Explode();
-
-        SpawnPiece();
+        if (activePieces.Count() == 0)
+        {
+            Explode();
+            SpawnPiece();
+        }
     }
 
     private void Explode()
     {
-        foreach (var explodingTile in GetExplodingTiles())
+        var explodingTiles = GetExplodingTiles();
+        foreach (var explodingTile in explodingTiles)
         {
             tilemap.SetTile(explodingTile, null);
         }
+
     }
 
     IEnumerable<Vector3Int> SliceTilesOnlyPositions(Vector3Int direction, Vector3Int position)
@@ -184,10 +215,12 @@ public class BoardMonoBehaviour : MonoBehaviour
         }
         return result;
     }
-    
-    //private IEnumerable<BasePiece> GetPiecesAboveExplodedPieces(IEnumerable<Vector3Int> explosionPositions)
-    //{
-    //    //explosionPositions
-    //    //    .Select(x => )
-    //}
+
+    private IEnumerable<BasePiece> GetPiecesAboveExplodedPieces(IEnumerable<Vector3Int> explosionPositions)
+    {
+        return explosionPositions
+            .Select(explodedPosition => new { position = explodedPosition, tiles = SliceTiles(Vector3Int.down, explodedPosition)})
+            .Where(x => x.tiles.Count() > 0)
+            .Select(x => BasePiece.CreatePiece(this, (Vector2Int)x.position, x.tiles));
+    }
 }

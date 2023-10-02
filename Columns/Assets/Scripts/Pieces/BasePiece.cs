@@ -10,8 +10,18 @@ public class BasePiece : MonoBehaviour
     protected BoardMonoBehaviour board;
     protected Tile[] tiles;
     protected Vector3Int position;
+    [SerializeField]
     protected float stepDelay = 0.5f;
     protected float stepTime = 0;
+
+    public static BasePiece CreatePiece(BoardMonoBehaviour board, Vector2Int position, IEnumerable<TilePosition> tiles)
+    {
+        var result = new BasePiece();
+        result.board = board;
+        result.position = (Vector3Int)position;
+        result.tiles = tiles.Select(x => x.tile).ToArray();
+        return result;
+    }
 
     protected virtual float StepDelay
     {
@@ -67,7 +77,7 @@ public class BasePiece : MonoBehaviour
         bool didMoveDown = TryMoveIfValid(Vector2Int.down);
         if (!didMoveDown)
         {
-            board.ActivePieceCantMoveDown();
+            board.ActivePieceCantMoveDown(this);
         }
     }
 
