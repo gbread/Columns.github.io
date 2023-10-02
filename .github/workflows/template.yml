@@ -63,6 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        projectPath:
+          - ./
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
