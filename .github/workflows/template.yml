@@ -97,7 +97,7 @@ jobs:
 
       - uses: webbertakken/unity-builder@v2
         with:
-          projectPath: ${{ matrix.projectPath }}
+          projectPath: ./Columns/
           targetPlatform: WebGL
 
       - uses: actions/upload-artifact@v2
