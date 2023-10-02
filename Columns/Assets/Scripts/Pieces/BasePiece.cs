@@ -14,9 +14,10 @@ public class BasePiece : MonoBehaviour
     protected float stepDelay = 0.5f;
     protected float stepTime = 0;
 
-    public static BasePiece CreatePiece(BoardMonoBehaviour board, Vector2Int position, IEnumerable<TilePosition> tiles)
+    public static BasePiece CreatePiece(BoardMonoBehaviour board, Vector2Int position, IEnumerable<TilePosition> tiles, GameObject prefab)
     {
-        var result = new BasePiece();
+        var newGameObject = Instantiate(prefab, board.transform);
+        var result = newGameObject.GetComponent<BasePiece>();
         result.board = board;
         result.position = (Vector3Int)position;
         result.tiles = tiles.Select(x => x.tile).ToArray();

@@ -129,6 +129,9 @@ public class BoardMonoBehaviour : MonoBehaviour
         if (activePieces.Count() == 0)
         {
             Explode();
+        }
+        if (activePieces.Count() == 0)
+        {
             SpawnPiece();
         }
     }
@@ -141,6 +144,9 @@ public class BoardMonoBehaviour : MonoBehaviour
             tilemap.SetTile(explodingTile, null);
         }
         freshPositions.Clear();
+
+        var newPieces = GetPiecesAboveExplodedPieces(explodingTiles);
+        activePieces.AddRange(newPieces);
     }
 
     IEnumerable<Vector3Int> SliceTilesOnlyPositions(Vector3Int direction, Vector3Int position)
@@ -218,8 +224,8 @@ public class BoardMonoBehaviour : MonoBehaviour
     private IEnumerable<BasePiece> GetPiecesAboveExplodedPieces(IEnumerable<Vector3Int> explosionPositions)
     {
         return explosionPositions
-            .Select(explodedPosition => new { position = explodedPosition, tiles = SliceTiles(Vector3Int.down, explodedPosition)})
+            .Select(explodedPosition => new { position = explodedPosition + Vector3Int.up, tiles = SliceTiles(Vector3Int.down, explodedPosition)})
             .Where(x => x.tiles.Count() > 0)
-            .Select(x => BasePiece.CreatePiece(this, (Vector2Int)x.position, x.tiles));
+            .Select(x => BasePiece.CreatePiece(this, (Vector2Int)x.position, x.tiles.Reverse(), basePiecePrefab));
     }
 }
