@@ -85,6 +85,7 @@ public class Board : MonoBehaviour
 
     private IEnumerable<TilePosition> GetExplodingTilesFromRow(IEnumerable<TilePosition> tiles)
     {
+        if (tiles.Count() == 0) return new TilePosition[0];
         Func<TilePosition, TilePosition, bool> tilesAreEqual = (a, b) => a.tile.name == b.tile.name;
         var currentTiles = new HashSet<TilePosition>();
         var result = new List<TilePosition>();
@@ -126,11 +127,8 @@ public class Board : MonoBehaviour
             foreach (var direction in directions)
             {
                 var slice = SliceTiles((Vector3Int)direction, tilePosition.position);
+                if (slice.Count() == 0) continue;
                 var explodingTiles = GetExplodingTilesFromRow(slice);
-                if (explodingTiles.Count() > 0)
-                {
-                    Console.WriteLine(tilePosition.position);
-                }
                 result.UnionWith(explodingTiles.Select(x => x.position));
             }
         }
