@@ -16,10 +16,15 @@ namespace Assets.Scripts
         [SerializeField]
         private GameObject playerPiecePrefab;
         [SerializeField]
+        private GameObject ghostPiecePrefab;
+        [SerializeField]
         private GameObject basePiecePrefab;
+
+        private GhostPiece ghostPiece;
 
         private void Awake()
         {
+            ghostPiece = GetComponentInChildren<GhostPiece>();
             board = GetComponent<Board>();
         }
 
@@ -39,6 +44,10 @@ namespace Assets.Scripts
         private void DeletePiece(BasePiece piece)
         {
             piece.enabled = false;
+            if (piece is PlayerPiece)
+            {
+                ghostPiece.PlayerPiece = null;
+            }
             activePieces.Remove(piece);
             Destroy(piece.gameObject);
         }
@@ -69,7 +78,9 @@ namespace Assets.Scripts
             activePiece.InitializeRandomTiles(board, board.spawnPosition, this);
             activePieces.Add(activePiece);
 
-            if (!activePiece.TryMoveIfValid(Vector2Int.zero))
+            ghostPiece.PlayerPiece = activePiece;
+            
+                if (!activePiece.TryMoveIfValid(Vector2Int.zero))
             {
                 GameOver();
             }

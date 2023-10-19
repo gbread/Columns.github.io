@@ -7,9 +7,9 @@ using UnityEngine.Tilemaps;
 
 public class BasePiece : MonoBehaviour
 {
-    protected Board board;
+    public Board board;
     protected Tile[] tiles;
-    protected Vector3Int position;
+    public Vector3Int Position { get; protected set; }
     [SerializeField]
     protected float stepDelay = 0.5f;
     protected float stepTime = 0;
@@ -19,7 +19,7 @@ public class BasePiece : MonoBehaviour
     protected void Initialize(Board board, Vector2Int position, IPieceCantFallDelegate pieceCantFallDelegate)
     {
         this.board = board;
-        this.position = (Vector3Int)position;
+        this.Position = (Vector3Int)position;
         this.pieceCantFallDelegate = pieceCantFallDelegate;
     }
     public static BasePiece CreatePiece(Board board, Vector2Int position, IEnumerable<TilePosition> tiles, GameObject prefab, IPieceCantFallDelegate pieceCantFallDelegate)
@@ -43,7 +43,7 @@ public class BasePiece : MonoBehaviour
     {
         get
         {
-            return TilePositionsRelativeTo(this.position);
+            return TilePositionsRelativeTo(this.Position);
         }
     }
 
@@ -77,17 +77,23 @@ public class BasePiece : MonoBehaviour
         bool didMoveDown = TryMoveIfValid(Vector2Int.down);
         if (!didMoveDown)
         {
-            pieceCantFallDelegate.PieceCantFallCallback(this);
+            pieceCantFallDelegate?.PieceCantFallCallback(this);
         }
+    }
+
+    public void Drop()
+    {
+        while (TryMoveIfValid(Vector2Int.down)) { }
+        pieceCantFallDelegate?.PieceCantFallCallback(this);
     }
 
     public bool TryMoveIfValid(Vector2Int translation)
     {
-        Vector3Int newPostion = position + (Vector3Int)translation;
+        Vector3Int newPostion = Position + (Vector3Int)translation;
         if (TilePositionsRelativeTo(newPostion).Any(x => !board.IsEmptyAndInsideTheBoard(x.position)))
             return false;
 
-        position = newPostion;
+        Position = newPostion;
         return true;
     }
 }

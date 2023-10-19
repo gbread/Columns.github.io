@@ -20,7 +20,7 @@ public class PlayerPiece : BasePiece
         {
             for (int i = 0; i < tiles.Length; i++)
             {
-                yield return position + i * Vector3Int.up;
+                yield return Position + i * Vector3Int.up;
             }
         }
     }
@@ -68,11 +68,7 @@ public class PlayerPiece : BasePiece
         }
     }
 
-    void Drop()
-    {
-        while (TryMoveIfValid(Vector2Int.down)) { }
-        pieceCantFallDelegate.PieceCantFallCallback(this);
-    }
+
 
     void Rotate(int count)
     {

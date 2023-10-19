@@ -14,6 +14,9 @@ public class Board : MonoBehaviour
     [SerializeField]
     private Vector2Int boardSize = new Vector2Int(10, 20);
 
+    [SerializeField]
+    private Tile ghostTile;
+
     private RectInt Bounds
     {
         get
@@ -40,7 +43,21 @@ public class Board : MonoBehaviour
 
     public void Clear(BasePiece piece)
     {
+        if (piece is GhostPiece)
+        {
+            Clear((GhostPiece)piece);
+            return;
+        }
+
         Clear(piece.TilePositions.Select(tilePosition => tilePosition.position));
+    }
+    public void Clear(GhostPiece piece)
+    {
+        Clear(
+            piece.TilePositions
+            .Select(tilePosition => tilePosition.position)
+            .Where(position => IsEmptyOrOutside(position))
+            );
     }
     public void Clear()
     {
@@ -62,8 +79,9 @@ public class Board : MonoBehaviour
 
     bool IsEmptyOrOutside(Vector3Int position)
     {
-        if (tilemap.HasTile(position)) return false;
-        return true;
+        if (!tilemap.HasTile(position)) return true;
+        if (tilemap.GetTile<Tile>(position) == ghostTile) return true;
+        return false;
     }
 
     IEnumerable<Vector3Int> SliceTilesOnlyPositions(Vector3Int direction, Vector3Int position)
